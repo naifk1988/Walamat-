@@ -359,10 +359,11 @@ body.marks .w.has.hl,.w.hl{color:var(--hl-ink)}
 .site input{flex:1 1 260px}.site input::placeholder{color:#cfe1da}
 .site select{flex:0 1 170px}.site .wseg button{background:rgba(255,255,255,.09)}.site select option{color:#111}
 .site .wseg{display:flex;gap:4px}
+.site .pgn{display:flex;align-items:center;gap:4px}.site .pgn button{font:700 18px var(--f-ui);color:#eaf3ef;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);border-radius:10px;min-width:40px;min-height:40px;cursor:pointer}.site .pgn span{font:600 14px var(--f-ui);min-width:58px;text-align:center;color:#eaf3ef}
 .site .wseg button[aria-pressed=true]{background:#c9a54a;border-color:#c9a54a;color:#14231f}
 .site :focus-visible{outline:2px solid #e6c46a;outline-offset:2px}
 .fbar.top{display:none!important}
-#app>.fbar.bot{position:static;flex:none;opacity:1!important;pointer-events:auto!important;transform:none!important;margin:6px auto calc(6px + env(safe-area-inset-bottom,0px));width:min(760px,calc(100% - 20px));left:auto;right:auto}
+#app>.fbar.bot{display:none!important;position:static;flex:none;opacity:1!important;pointer-events:auto!important;transform:none!important;margin:6px auto calc(6px + env(safe-area-inset-bottom,0px));width:min(760px,calc(100% - 20px));left:auto;right:auto}
 #app>.fbar.bot #imams{display:none}
 .res{display:block;width:100%;text-align:start;background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin:6px 0;color:var(--ink);font:400 14px var(--f-ui);cursor:pointer}
 .res .rv{display:block;font:20px/1.9 var(--f-uth);color:var(--ink)}
@@ -374,7 +375,7 @@ body.marks .w.has.hl,.w.hl{color:var(--hl-ink)}
 .page.fixed{height:auto!important;align-self:flex-start!important}
 .page.fixed .lines{justify-content:flex-start!important;flex:none!important}
 .page.fixed .line{line-height:1.95!important}
-@media (max-width:560px){.site .brand small{display:none}.site input{flex:1 1 100%}.site select{flex:1 1 45%}.site .wseg{flex:1 1 50%}.site .wseg button{flex:1;padding:6px 6px}.site nav button{padding:5px 9px}}
+@media (max-width:560px){.site .pgn{display:none}.site .brand small{display:none}.site input{flex:1 1 100%}.site select{flex:1 1 45%}.site .wseg{flex:1 1 50%}.site .wseg button{flex:1;padding:6px 6px}.site nav button{padding:5px 9px}}
 </style>
 
 <div id="app">
@@ -383,7 +384,8 @@ body.marks .w.has.hl,.w.hl{color:var(--hl-ink)}
       <nav aria-label="أقسام الموقع"><button id="nIndex">السور</button><button id="nFawaid">الفوائد</button><button id="nAbout">عن الكتاب</button><button id="nTheme" aria-label="الوضع الليلي">ليلي/نهاري</button></nav></div>
     <div class="r2"><input id="sq" type="search" placeholder="ابحث في المسائل والفوائد: عبارة من الآية أو رقم مسألة" aria-label="بحث">
       <select id="ssel" aria-label="السورة"></select>
-      <div class="wseg" role="group" aria-label="ما يُلوَّن في المصحف"><button data-o="">الكل</button><button data-o="w">المسائل</button><button data-o="f">الفوائد</button></div></div>
+      <div class="wseg" role="group" aria-label="ما يُلوَّن في المصحف"><button data-o="">الكل</button><button data-o="w">المسائل</button><button data-o="f">الفوائد</button></div>
+      <div class="pgn"><button id="hPrev" aria-label="الصفحة السابقة">›</button><span id="hPg"></span><button id="hNext" aria-label="الصفحة التالية">‹</button></div></div>
   </header>
   <main id="stage" aria-live="polite"></main>
 </div>
@@ -979,10 +981,11 @@ $("#sq").addEventListener("input",e=>{clearTimeout(sqT);const v=e.target.value;i
 document.querySelectorAll(".site .wseg button").forEach(b=>b.onclick=()=>{chooseImam(b.dataset.o||null);siteSeg()});
 $("#nIndex").onclick=()=>$("#btnIndex").click();$("#nAbout").onclick=()=>$("#btnBooks").click();$("#nTheme").onclick=()=>$("#btnTheme").click();
 $("#nFawaid").onclick=()=>{if(META)siteFawaid()};
+$("#hPrev").onclick=()=>$("#prev").click();$("#hNext").onclick=()=>$("#next").click();
 $("#siteHome").onclick=e=>{e.preventDefault();st.page=1;render()};
 $("#app").appendChild(document.querySelector(".fbar.bot"));
 // keep the surah chooser on the surah being read
-setInterval(()=>{const p=st.page;let i=0;while(i<113&&SPAGE[i+1]<=p)i++;const sel=$("#ssel");if(sel&&+sel.value!==i&&document.activeElement!==sel)sel.value=i},700);
+setInterval(()=>{const p=st.page;let i=0;while(i<113&&SPAGE[i+1]<=p)i++;const sel=$("#ssel");if(sel&&+sel.value!==i&&document.activeElement!==sel)sel.value=i;const hp=$("#hPg");if(hp)hp.textContent="ص "+ar(p)},500);
 loadData().then(()=>{siteSeg();if(st.only&&(!SRC[st.only]||!ON.includes(st.only)))st.only=null;applyMarks();drawImams();if(!fromHash())render();toggleChrome(true)})
  .catch(()=>{$("#stage").innerHTML='<div class="loading">تعذّر تحميل بيانات «وعلامات». تحقّق من الاتصال ثم أعد فتح الصفحة.</div>'});
 window.addEventListener("hashchange",fromHash);
